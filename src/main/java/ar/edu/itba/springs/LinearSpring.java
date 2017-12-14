@@ -1,8 +1,8 @@
-package ar.edu.itba;
+package ar.edu.itba.springs;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
-public class Spring {
+public class LinearSpring {
     private double k;
     private double gamma;
     private double restDistance;
@@ -25,13 +25,13 @@ public class Spring {
                 .scalarMultiply(1.0/norm);
     }
 
-    public Spring(double k, double restDistance) {
+    public LinearSpring(double k, double restDistance) {
         this.k = k;
         this.gamma = 0;
         this.restDistance = restDistance;
     }
 
-    public Spring(double k, double gamma, double restDistance) {
+    public LinearSpring(double k, double gamma, double restDistance) {
         this.k = k;
         this.gamma = gamma;
         this.restDistance = restDistance;

@@ -1,4 +1,4 @@
-package ar.edu.itba;
+package ar.edu.itba.integrators;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
