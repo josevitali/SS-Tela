@@ -6,28 +6,32 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class FabricParticle extends Particle{
-    private Collection<Particle> neighbours;
+    private Collection<FabricParticle> neighbours;
     private Collection<LongDistanceNeighbour> longDistanceNeighbours;
-    private double radius;
+    private boolean unmovable = false;
 
     public FabricParticle(String id, double mass, double radius, Vector3D position) {
-        super(id, mass, position);
+        super(id, mass, position, radius);
         this.neighbours = new HashSet<>();
+        this.longDistanceNeighbours = new HashSet<>();
     }
 
-    public FabricParticle(String id, double mass, double radius, Vector3D position, Collection<Particle> neighbours, Collection<LongDistanceNeighbour> longDistanceNeighbours) {
-        super(id, mass, position);
+    public FabricParticle(String id, double mass, double radius, Vector3D position, Collection<FabricParticle> neighbours, Collection<LongDistanceNeighbour> longDistanceNeighbours) {
+        super(id, mass, position, radius);
         this.neighbours = neighbours;
         this.longDistanceNeighbours = longDistanceNeighbours;
-        this.radius = radius;
     }
 
-    public Collection<Particle> getNeighbours() {
+    public Collection<FabricParticle> getNeighbours() {
         return neighbours;
     }
 
     public Collection<LongDistanceNeighbour> getLongDistanceNeighbours() {
         return longDistanceNeighbours;
+    }
+
+    public boolean isUnmovable() {
+        return unmovable;
     }
 
     public void setPosition(Vector3D position) {
@@ -46,7 +50,11 @@ public class FabricParticle extends Particle{
         this.previousPosition = previousPosition;
     }
 
-    public FabricParticle addNeighbour(Particle particle) {
+    public void setUnmovable(boolean unmovable) {
+        this.unmovable = unmovable;
+    }
+
+    public FabricParticle addNeighbour(FabricParticle particle) {
         this.neighbours.add(particle);
         return this;
     }
@@ -56,7 +64,4 @@ public class FabricParticle extends Particle{
         return this;
     }
 
-    public double getRadius() {
-        return radius;
-    }
 }

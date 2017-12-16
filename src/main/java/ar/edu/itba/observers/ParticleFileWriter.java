@@ -14,9 +14,11 @@ import java.util.Observer;
 
 public class ParticleFileWriter implements Observer {
     private BufferedWriter writer;
+    private int index;
 
     public ParticleFileWriter(String filename) throws  IOException{
         writer = new BufferedWriter(new FileWriter(filename));
+        index = 0;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class ParticleFileWriter implements Observer {
             FabricSimulation sim = (FabricSimulation) observable;
             Collection<FabricParticle> particles = sim.getParticles();
             try {
-                writer.write(String.format("%d\nTime = %g\n", particles.size(), sim.getTime()));
+                writer.write(String.format("%d\n%d\n", particles.size(), index++));
 
                 for (FabricParticle particle : particles) {
                     writer.write(formatParticle(particle));

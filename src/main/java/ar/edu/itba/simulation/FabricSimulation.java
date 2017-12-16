@@ -19,24 +19,24 @@ public class FabricSimulation extends Observable {
     private Integrator integrator;
 
     public FabricSimulation(Parameters parameters, Collection<Observer> observers) {
-        this.t = parameters.initialT;
-        this.dt = parameters.dt;
-        this.linearSpring = parameters.linearSpring;
-        this.torsionSpring = parameters.torsionSpring;
-        this.integrator = parameters.integrator;
-        this.particles = this.generateParticles(parameters.width, parameters.height, parameters.initialState);
+        this.t = parameters.getInitialT();
+        this.dt = parameters.getDt();
+        this.linearSpring = parameters.getLinearSpring();
+        this.torsionSpring = parameters.getTorsionSpring();
+        this.integrator = parameters.getIntegrator();
+        this.particles = this.generateParticles(parameters.getWidth(), parameters.getHeight(), parameters.getInitialState());
         observers.forEach(this::addObserver);
     }
 
     public Vector3D getAppliedForce(FabricParticle particle) {
         Vector3D totalForce = Vector3D.ZERO;
         for (Particle neighbour: particle.getNeighbours()) {
-            totalForce.add(linearSpring.getForce(particle.getPosition(),neighbour.getPosition(),particle.getPreviousPosition(), neighbour.getPreviousPosition(), dt));
+            totalForce.add(linearSpring.getForce(particle, neighbour, dt));
         }
         for (LongDistanceNeighbour longNeighbour : particle.getLongDistanceNeighbours()) {
             Particle middle = longNeighbour.getMiddleNeighbour();
             Particle opposite = longNeighbour.getOppositeNeighbour();
-            totalForce.add(torsionSpring.getForce(particle.getPosition(), opposite.getPosition(), middle.getPosition(), particle.getPreviousPosition(), opposite.getPreviousPosition(), dt));
+            totalForce.add(torsionSpring.getForce(particle, opposite, middle, dt));
         }
         totalForce.add(GRAVITY);
         return totalForce;
@@ -52,19 +52,25 @@ public class FabricSimulation extends Observable {
     }
 
     public FabricSimulation simulate(int steps) {
+        this.setChanged();
+        this.notifyObservers();
         for (int i = 0; i < steps; i++) {
             for (FabricParticle particle: particles) {
-                particle.setForce(getAppliedForce(particle));
-                update(particle);
+                if(!particle.isUnmovable()) {
+                    particle.setForce(getAppliedForce(particle));
+                    update(particle);
+                }
             }
-            this.setChanged();
-            this.notifyObservers();
+            if(i % 100 == 0) {
+                this.setChanged();
+                this.notifyObservers();
+            }
         }
         return this;
     }
 
-    private Collection<FabricParticle> generateParticles(int width, int height, BiFunction<Integer, Integer, Particle> initialState) {
-        Particle[][] matrix = new FabricParticle[width][height];
+    private Collection<FabricParticle> generateParticles(int width, int height, BiFunction<Integer, Integer, FabricParticle> initialState) {
+        FabricParticle[][] matrix = new FabricParticle[width][height];
         Set<FabricParticle> particles = new HashSet<>(width*height);
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -78,7 +84,7 @@ public class FabricSimulation extends Observable {
         for (int i=0; i<width; i++) {
             for (int j=0; j<height; j++) {
                 if (matrix[i][j] instanceof FabricParticle) {
-                    FabricParticle particle = (FabricParticle) matrix[i][j];
+                    FabricParticle particle = matrix[i][j];
 
                     for (int[] offset : offsets) {
                         final int x = j + offset[0];
@@ -98,10 +104,15 @@ public class FabricSimulation extends Observable {
                             if(longOffset[0] < 0) l = x + 1;
                             if(longOffset[1] > 0) m = y - 1;
                             if(longOffset[1] < 0) m = y + 1;
+                            //System.out.println("m : " + m + " - l: " + l + " - y: " + y + " - x: " + x);
                             LongDistanceNeighbour neighbour = new LongDistanceNeighbour(matrix[m][l], matrix[y][x]);
                             particle.addLongDistanceNeighbour(neighbour);
                         }
                     }
+                    if(particle.getId().equals("0") || particle.getId().equals("20")) {
+                        particle.setUnmovable(true);
+                    }
+                    particles.add(particle);
                 }
             }
         }

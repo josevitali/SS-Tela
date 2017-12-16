@@ -128,3 +128,5 @@ buildNumber.properties
 # End of https://www.gitignore.io/api/java,maven,matlab,intellij+iml
 
 .idea
+
+out.txt

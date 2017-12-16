@@ -21,7 +21,7 @@ public class FlatStates {
 
     public Particle flat1BorderState(int i, int j) {
         if (i == 0) {
-            return new StaticParticle(generator.getID(), particleMass, getPos(i, j));
+            return new StaticParticle(generator.getID(), particleMass, getPos(i, j), particleRadius);
         }
         return new FabricParticle(generator.getID(), particleMass, particleRadius, getPos(i, j));
     }
