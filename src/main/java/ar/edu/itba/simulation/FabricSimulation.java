@@ -3,6 +3,7 @@ package ar.edu.itba.simulation;
 import ar.edu.itba.springs.LinearSpring;
 import ar.edu.itba.integrators.Integrator;
 import ar.edu.itba.particles.*;
+import ar.edu.itba.springs.TorsionSpring;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.util.*;
@@ -11,6 +12,7 @@ import java.util.function.BiFunction;
 public class FabricSimulation extends Observable {
     public static Vector3D GRAVITY = new Vector3D(0, -9.8, 0);
     private LinearSpring linearSpring;
+    private TorsionSpring torsionSpring;
     private double dt;
     private double t;
     private Collection<FabricParticle> particles;
@@ -20,6 +22,7 @@ public class FabricSimulation extends Observable {
         this.t = parameters.initialT;
         this.dt = parameters.dt;
         this.linearSpring = parameters.linearSpring;
+        this.torsionSpring = parameters.torsionSpring;
         this.integrator = parameters.integrator;
         this.particles = this.generateParticles(parameters.width, parameters.height, parameters.initialState);
         observers.forEach(this::addObserver);
@@ -29,6 +32,11 @@ public class FabricSimulation extends Observable {
         Vector3D totalForce = Vector3D.ZERO;
         for (Particle neighbour: particle.getNeighbours()) {
             totalForce.add(linearSpring.getForce(particle.getPosition(),neighbour.getPosition(),particle.getPreviousPosition(), neighbour.getPreviousPosition(), dt));
+        }
+        for (LongDistanceNeighbour longNeighbour : particle.getLongDistanceNeighbours()) {
+            Particle middle = longNeighbour.getMiddleNeighbour();
+            Particle opposite = longNeighbour.getOppositeNeighbour();
+            totalForce.add(torsionSpring.getForce(particle.getPosition(), opposite.getPosition(), middle.getPosition(), particle.getPreviousPosition(), opposite.getPreviousPosition(), dt));
         }
         totalForce.add(GRAVITY);
         return totalForce;
@@ -63,18 +71,37 @@ public class FabricSimulation extends Observable {
                 matrix[i][j] = initialState.apply(i, j);
             }
         }
-        for (int i=1; i<width+1; i++) {
-            for (int j=1; j<height+1; j++) {
+
+        final int[][] offsets = new int[][]{ {-1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {1, 0}, {0, -1}, {1, -1} };
+        final int[][] longOffsets = new int[][]{ {-2, 0}, {2, 0}, {0, -2}, {0, 2} };
+
+        for (int i=0; i<width; i++) {
+            for (int j=0; j<height; j++) {
                 if (matrix[i][j] instanceof FabricParticle) {
-                    particles.add(((FabricParticle) matrix[i][j])
-                            .addNeighbour(matrix[i - 1][j - 1])
-                            .addNeighbour(matrix[i][j - 1])
-                            .addNeighbour(matrix[i + 1][j - 1])
-                            .addNeighbour(matrix[i - 1][j])
-                            .addNeighbour(matrix[i + 1][j])
-                            .addNeighbour(matrix[i - 1][j + 1])
-                            .addNeighbour(matrix[i][j + 1])
-                            .addNeighbour(matrix[i + 1][j + 1]));
+                    FabricParticle particle = (FabricParticle) matrix[i][j];
+
+                    for (int[] offset : offsets) {
+                        final int x = j + offset[0];
+                        final int y = i + offset[1];
+                        if(! (x < 0 || y < 0 || x >= width || y >= height)) {
+                            particle.addNeighbour(matrix[y][x]);
+                        }
+                    }
+
+                    for (int[] longOffset : longOffsets) {
+                        final int x = j + longOffset[0];
+                        final int y = i + longOffset[1];
+                        if(! (x < 0 || y < 0 || x >= width || y >= height)) {
+                            int l = 0;
+                            int m = 0;
+                            if(longOffset[0] > 0) l = x - 1;
+                            if(longOffset[0] < 0) l = x + 1;
+                            if(longOffset[1] > 0) m = y - 1;
+                            if(longOffset[1] < 0) m = y + 1;
+                            LongDistanceNeighbour neighbour = new LongDistanceNeighbour(matrix[m][l], matrix[y][x]);
+                            particle.addLongDistanceNeighbour(neighbour);
+                        }
+                    }
                 }
             }
         }

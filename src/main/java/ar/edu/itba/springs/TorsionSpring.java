@@ -14,7 +14,7 @@ public class TorsionSpring {
         this.restAngle = naturalAngle;
     }
 
-    public Vector3D getForce(Vector3D position1, Vector3D position2, Vector3D middle, Vector3D previous1, Vector3D previous2, Vector3D previousMiddle, double dt) {
+    public Vector3D getForce(Vector3D position1, Vector3D position2, Vector3D middle, Vector3D previous1, Vector3D previous2, double dt) {
 
         final Vector3D distance1 = middle.subtract(position1);
         final Vector3D distance2 = position2.subtract(middle);

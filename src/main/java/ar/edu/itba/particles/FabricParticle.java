@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 public class FabricParticle extends Particle{
     private Collection<Particle> neighbours;
+    private Collection<LongDistanceNeighbour> longDistanceNeighbours;
     private double radius;
 
     public FabricParticle(String id, double mass, double radius, Vector3D position) {
@@ -14,14 +15,19 @@ public class FabricParticle extends Particle{
         this.neighbours = new HashSet<>();
     }
 
-    public FabricParticle(String id, double mass, double radius, Vector3D position, Collection<Particle> neighbours) {
+    public FabricParticle(String id, double mass, double radius, Vector3D position, Collection<Particle> neighbours, Collection<LongDistanceNeighbour> longDistanceNeighbours) {
         super(id, mass, position);
         this.neighbours = neighbours;
+        this.longDistanceNeighbours = longDistanceNeighbours;
         this.radius = radius;
     }
 
     public Collection<Particle> getNeighbours() {
         return neighbours;
+    }
+
+    public Collection<LongDistanceNeighbour> getLongDistanceNeighbours() {
+        return longDistanceNeighbours;
     }
 
     public void setPosition(Vector3D position) {
@@ -42,6 +48,11 @@ public class FabricParticle extends Particle{
 
     public FabricParticle addNeighbour(Particle particle) {
         this.neighbours.add(particle);
+        return this;
+    }
+
+    public FabricParticle addLongDistanceNeighbour(LongDistanceNeighbour neighbour) {
+        this.longDistanceNeighbours.add(neighbour);
         return this;
     }
 
