@@ -31,7 +31,7 @@ public class LinearSpring {
         double disp = norm - previousDistance.getNorm();
         return distance
                 .scalarMultiply(-k*x -gamma*(disp/dt))
-                .scalarMultiply(1.0/norm);
+                .scalarMultiply(1.0/norm).negate();
     }
 
     public LinearSpring(double k, double restDistance) {

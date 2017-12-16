@@ -53,7 +53,7 @@ public class App  {
 
         FabricSimulation fabricSimulation = new FabricSimulation(parameters, observers);
 
-        fabricSimulation.simulate(50000);
+        fabricSimulation.simulate(100000);
 
 
     }

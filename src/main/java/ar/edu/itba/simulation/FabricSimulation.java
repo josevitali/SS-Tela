@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 public class FabricSimulation extends Observable {
-    public static Vector3D GRAVITY = new Vector3D(0, -9.8, 0);
+    public static Vector3D GRAVITY = new Vector3D(0, 0, -9.8);
     private LinearSpring linearSpring;
     private TorsionSpring torsionSpring;
     private double dt;
@@ -31,14 +31,14 @@ public class FabricSimulation extends Observable {
     public Vector3D getAppliedForce(FabricParticle particle) {
         Vector3D totalForce = Vector3D.ZERO;
         for (Particle neighbour: particle.getNeighbours()) {
-            totalForce.add(linearSpring.getForce(particle, neighbour, dt));
+            totalForce = totalForce.add(linearSpring.getForce(particle, neighbour, dt));
         }
         for (LongDistanceNeighbour longNeighbour : particle.getLongDistanceNeighbours()) {
             Particle middle = longNeighbour.getMiddleNeighbour();
             Particle opposite = longNeighbour.getOppositeNeighbour();
-            totalForce.add(torsionSpring.getForce(particle, opposite, middle, dt));
+            totalForce = totalForce.add(torsionSpring.getForce(particle, opposite, middle, dt));
         }
-        totalForce.add(GRAVITY);
+        totalForce = totalForce.add(GRAVITY);
         return totalForce;
     }
 
@@ -54,10 +54,26 @@ public class FabricSimulation extends Observable {
     public FabricSimulation simulate(int steps) {
         this.setChanged();
         this.notifyObservers();
+
+        /*for (FabricParticle particle: particles) {
+            if(!particle.isUnmovable()) {
+                particle.setForce(getAppliedForce(particle));
+            }
+        }
+        for (FabricParticle particle : particles) {
+            Vector3D[] newVals = integrator.integrate(particle.getPosition(), particle.getVelocity(), particle.getAcceleration(), particle.getPreviousPosition(), -dt);
+            particle.setPreviousPosition(newVals[0]);
+            particle.setForce(Vector3D.ZERO);
+        }*/
+
         for (int i = 0; i < steps; i++) {
             for (FabricParticle particle: particles) {
                 if(!particle.isUnmovable()) {
                     particle.setForce(getAppliedForce(particle));
+                }
+            }
+            for (FabricParticle particle: particles) {
+                if(!particle.isUnmovable()) {
                     update(particle);
                 }
             }
@@ -78,7 +94,7 @@ public class FabricSimulation extends Observable {
             }
         }
 
-        final int[][] offsets = new int[][]{ {-1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {1, 0}, {0, -1}, {1, -1} };
+        final int[][] offsets = new int[][]{ {-1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {1, 0}, {0, -1}, {1, -1}, {1, 1} };
         final int[][] longOffsets = new int[][]{ {-2, 0}, {2, 0}, {0, -2}, {0, 2} };
 
         for (int i=0; i<width; i++) {
@@ -98,18 +114,17 @@ public class FabricSimulation extends Observable {
                         final int x = j + longOffset[0];
                         final int y = i + longOffset[1];
                         if(! (x < 0 || y < 0 || x >= width || y >= height)) {
-                            int l = 0;
-                            int m = 0;
+                            int l = x;
+                            int m = y;
                             if(longOffset[0] > 0) l = x - 1;
                             if(longOffset[0] < 0) l = x + 1;
                             if(longOffset[1] > 0) m = y - 1;
                             if(longOffset[1] < 0) m = y + 1;
-                            //System.out.println("m : " + m + " - l: " + l + " - y: " + y + " - x: " + x);
                             LongDistanceNeighbour neighbour = new LongDistanceNeighbour(matrix[m][l], matrix[y][x]);
                             particle.addLongDistanceNeighbour(neighbour);
                         }
                     }
-                    if(particle.getId().equals("0") || particle.getId().equals("20")) {
+                    if(particle.getId().equals("1") || particle.getId().equals("20")) {
                         particle.setUnmovable(true);
                     }
                     particles.add(particle);
