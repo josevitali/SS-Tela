@@ -42,7 +42,7 @@ public class App  {
         List<Observer> observers = new ArrayList<>();
 
         try {
-            ParticleFileWriter particleFileWriter = new ParticleFileWriter("out.txt");
+            ParticleFileWriter particleFileWriter = new ParticleFileWriter("out.txt", "energies.csv");
             observers.add(particleFileWriter);
         } catch (IOException e) {
             e.printStackTrace();

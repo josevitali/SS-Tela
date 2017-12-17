@@ -15,6 +15,7 @@ public class Particle{
     protected Vector3D velocity;
     protected Vector3D force;
     private List<Vector3D> forces;
+    private final double G = 9.8;
 
     public Particle(String id, double mass, Vector3D position, double radius) {
         this.id = id;
@@ -87,6 +88,14 @@ public class Particle{
     public void addForce(Vector3D newForce) {
         //this.force = this.force.add(newForce);
         this.forces.add(newForce);
+    }
+
+    public double getKineticEnergy() {
+        return 0.5* mass * Math.pow(velocity.getNorm(),2.0);
+    }
+
+    public double getPotentialEnergy() {
+        return mass*G*position.getZ();
     }
 
     @Override

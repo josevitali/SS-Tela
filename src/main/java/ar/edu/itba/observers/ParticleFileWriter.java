@@ -13,11 +13,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class ParticleFileWriter implements Observer {
-    private BufferedWriter writer;
+    private BufferedWriter positionsWriter;
+    private BufferedWriter energiesWriter;
     private int index;
 
-    public ParticleFileWriter(String filename) throws  IOException{
-        writer = new BufferedWriter(new FileWriter(filename));
+    public ParticleFileWriter(String positionsFilename, String energiesFilename) throws  IOException{
+        positionsWriter = new BufferedWriter(new FileWriter(positionsFilename));
+        energiesWriter = new BufferedWriter(new FileWriter(energiesFilename));
         index = 0;
     }
 
@@ -26,12 +28,21 @@ public class ParticleFileWriter implements Observer {
         if (observable instanceof FabricSimulation) {
             FabricSimulation sim = (FabricSimulation) observable;
             Collection<FabricParticle> particles = sim.getParticles();
+            double kineticEnergy = 0.0;
+            double potentialEnergy = 0.0;
             try {
-                writer.write(String.format("%d\n%d\n", particles.size(), index++));
+                positionsWriter.write(String.format("%d\n%d\n", particles.size(), index++));
 
                 for (FabricParticle particle : particles) {
-                    writer.write(formatParticle(particle));
+                    positionsWriter.write(formatParticle(particle));
+                    kineticEnergy+= particle.getKineticEnergy();
+                    potentialEnergy+= particle.getPotentialEnergy();
                 }
+                kineticEnergy/= particles.size();
+                potentialEnergy/= particles.size();
+
+                //System.out.println(String.format("%f, %f", kineticEnergy, potentialEnergy));
+                energiesWriter.write(String.format("%f, %f\n", kineticEnergy, potentialEnergy));
 
             } catch (IOException e) {
                 System.out.println("Write operation failed");
