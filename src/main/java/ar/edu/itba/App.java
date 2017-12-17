@@ -13,6 +13,7 @@ import ar.edu.itba.springs.TorsionSpring;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Observer;
 
 public class App  {
@@ -26,6 +27,7 @@ public class App  {
     public static final double TORSION_K = K / 10;
     public static final double REST_DISTANCE = 3;
     public static final double TORSION_NATURAL_ANGLE = 0;
+    public static final double DAMPING_COEFICIENT = 0.025;
     public static final double DT = 0.00001;
     public static final double TIME = 2;
     public static final int STEPS = (int)(TIME / DT);
@@ -34,6 +36,8 @@ public class App  {
 
 
     public static void main(String[] args) {
+
+        Locale.setDefault(new Locale("en", "US"));
 
         List<Observer> observers = new ArrayList<>();
 
@@ -52,13 +56,12 @@ public class App  {
         parameters.setInitialState(new HangingInitialState(PARTICLE_DISTANCE, MASS, RADIUS));
         parameters.setInitialT(0);
         parameters.setIntegrator(new VerletIntegrator());
-        /*parameters.setLinearSpring(new LinearSpring(K, REST_DISTANCE));
-        parameters.setTorsionSpring(new TorsionSpring(TORSION_K, TORSION_NATURAL_ANGLE));*/
         parameters.setLinearK(K);
         parameters.setTorsionK(TORSION_K);
         parameters.setRestDistance(REST_DISTANCE);
         parameters.setTorsionNaturalAngle(TORSION_NATURAL_ANGLE);
         parameters.setMass(MASS);
+        parameters.setDampingCoeficient(DAMPING_COEFICIENT);
 
         FabricSimulation fabricSimulation = new FabricSimulation(parameters, observers);
 

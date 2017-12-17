@@ -42,7 +42,7 @@ public class TorsionSpring implements Spring{
     public void apply() {
 
         final Vector3D distanceVector1 = middle.getPosition().subtract(particle1.getPosition());
-        final Vector3D distanceVector2 = particle1.getPosition().subtract(middle.getPosition());
+        final Vector3D distanceVector2 = particle2.getPosition().subtract(middle.getPosition());
 
         final double angle = Vector3D.angle(distanceVector1, distanceVector2);
 

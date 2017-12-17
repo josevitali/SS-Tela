@@ -12,39 +12,23 @@ import java.util.function.BiFunction;
 
 public class FabricSimulation extends Observable {
     public Vector3D GRAVITY;
-    private LinearSpring linearSpring;
-    private TorsionSpring torsionSpring;
     private double dt;
     private double t;
     private Collection<FabricParticle> particles;
     private Integrator integrator;
     private Collection<Spring> springs;
     private FabricParticle[][] matrix;
+    double dampingCoeficient;
 
     public FabricSimulation(Parameters parameters, Collection<Observer> observers) {
         this.GRAVITY = new Vector3D(0, 0, - parameters.getMass() * 9.8);
         this.t = parameters.getInitialT();
+        this.dampingCoeficient = parameters.getDampingCoeficient();
         this.dt = parameters.getDt();
-        this.linearSpring = parameters.getLinearSpring();
-        this.torsionSpring = parameters.getTorsionSpring();
         this.integrator = parameters.getIntegrator();
         this.particles = this.generateParticles(parameters.getWidth(), parameters.getHeight(), parameters.getInitialState());
         this.springs = this.generateSprings(parameters.getWidth(), parameters.getHeight(), parameters.getLinearK(), parameters.getTorsionK(), parameters.getRestDistance(), parameters.getTorsionNaturalAngle());
         observers.forEach(this::addObserver);
-    }
-
-    public Vector3D getAppliedForce(FabricParticle particle) {
-        Vector3D totalForce = Vector3D.ZERO;
-        /*for (Particle neighbour: particle.getNeighbours()) {
-            totalForce = totalForce.add(linearSpring.getForce(particle, neighbour, dt));
-        }*/
-        /*for (LongDistanceNeighbour longNeighbour : particle.getLongDistanceNeighbours()) {
-            Particle middle = longNeighbour.getMiddleNeighbour();
-            Particle opposite = longNeighbour.getOppositeNeighbour();
-            totalForce = totalForce.add(torsionSpring.getForce(particle, opposite, middle, dt));
-        }*/
-        totalForce = totalForce.add(GRAVITY);
-        return totalForce;
     }
 
     public Particle update(FabricParticle particle) {
@@ -66,21 +50,16 @@ public class FabricSimulation extends Observable {
                 spring.apply();
             }
 
-            double dampingCoeficient = 0.025;
             double eps = Math.pow(10, -5);
 
             for (FabricParticle particle: particles) {
                 if(!particle.isUnmovable()) {
 
                     final double velocity = particle.getVelocity().getNorm();
-
                     if (! (velocity < eps)) {
                         final Vector3D dampingForce = particle.getVelocity().scalarMultiply(-dampingCoeficient);
                         particle.addForce(dampingForce);
                     }
-
-
-
 
                     particle.addForce(GRAVITY);
                     update(particle);
@@ -103,15 +82,12 @@ public class FabricSimulation extends Observable {
             }
         }
 
-        final int[][] offsets = new int[][]{ {-1, 1}, {0, 1}, {-1, 0}, {-1, -1}, {1, 0}, {0, -1}, {1, -1}, {1, 1} };
-        final int[][] longOffsets = new int[][]{ {-2, 0}, {2, 0}, {0, -2}, {0, 2} };
-
         for (int i=0; i<width; i++) {
             for (int j=0; j<height; j++) {
                 if (matrix[i][j] instanceof FabricParticle) {
                     FabricParticle particle = matrix[i][j];
 
-                    for (int[] offset : offsets) {
+                    /*for (int[] offset : offsets) {
                         final int x = j + offset[0];
                         final int y = i + offset[1];
                         if(! (x < 0 || y < 0 || x >= width || y >= height)) {
@@ -132,7 +108,7 @@ public class FabricSimulation extends Observable {
                             LongDistanceNeighbour neighbour = new LongDistanceNeighbour(matrix[m][l], matrix[y][x]);
                             particle.addLongDistanceNeighbour(neighbour);
                         }
-                    }
+                    }*/
                     /*if(particle.getId().equals("1") || particle.getId().equals("20")) {
                         particle.setUnmovable(true);
                     }*/
@@ -167,10 +143,11 @@ public class FabricSimulation extends Observable {
                     }
                 }
 
-                /*for (int[] longOffset : longOffsets) {
+                for (int[] longOffset : longOffsets) {
                     final int x = j + longOffset[0];
                     final int y = i + longOffset[1];
                     if(! (x < 0 || y < 0 || x >= width || y >= height)) {
+
                         int l = x;
                         int m = y;
                         if(longOffset[0] > 0) l = x - 1;
@@ -181,7 +158,7 @@ public class FabricSimulation extends Observable {
                         //LongDistanceNeighbour neighbour = new LongDistanceNeighbour(matrix[m][l], matrix[y][x]);
                         //particle.addLongDistanceNeighbour(neighbour);
                     }
-                }*/
+                }
 
             }
         }

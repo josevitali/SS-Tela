@@ -10,8 +10,6 @@ import java.util.function.BiFunction;
 
 public class Parameters {
     private int width,height;
-    private LinearSpring linearSpring;
-    private TorsionSpring torsionSpring;
     private double initialT, dt;
     private BiFunction<Integer, Integer, FabricParticle> initialState;
     private Integrator integrator;
@@ -20,6 +18,7 @@ public class Parameters {
     private double restDistance;
     private double torsionNaturalAngle;
     private double mass;
+    private double dampingCoeficient;
 
     public int getWidth() {
         return width;
@@ -35,22 +34,6 @@ public class Parameters {
 
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    public LinearSpring getLinearSpring() {
-        return linearSpring;
-    }
-
-    public void setLinearSpring(LinearSpring linearSpring) {
-        this.linearSpring = linearSpring;
-    }
-
-    public TorsionSpring getTorsionSpring() {
-        return torsionSpring;
-    }
-
-    public void setTorsionSpring(TorsionSpring torsionSpring) {
-        this.torsionSpring = torsionSpring;
     }
 
     public double getInitialT() {
@@ -123,5 +106,13 @@ public class Parameters {
 
     public void setMass(double mass) {
         this.mass = mass;
+    }
+
+    public double getDampingCoeficient() {
+        return dampingCoeficient;
+    }
+
+    public void setDampingCoeficient(double dampingCoeficient) {
+        this.dampingCoeficient = dampingCoeficient;
     }
 }
