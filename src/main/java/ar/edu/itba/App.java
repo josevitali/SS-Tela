@@ -40,9 +40,10 @@ public class App  {
         Locale.setDefault(new Locale("en", "US"));
 
         List<Observer> observers = new ArrayList<>();
+        ParticleFileWriter particleFileWriter = null;
 
         try {
-            ParticleFileWriter particleFileWriter = new ParticleFileWriter("out.txt", "energies.csv");
+            particleFileWriter = new ParticleFileWriter("out.txt", "energies.csv");
             observers.add(particleFileWriter);
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,8 +65,11 @@ public class App  {
         parameters.setDampingCoeficient(DAMPING_COEFICIENT);
 
         FabricSimulation fabricSimulation = new FabricSimulation(parameters, observers);
-
         fabricSimulation.simulate(STEPS);
+
+        if (particleFileWriter != null) {
+            particleFileWriter.finish();
+        }
 
 
     }

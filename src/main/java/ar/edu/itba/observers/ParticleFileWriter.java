@@ -50,6 +50,15 @@ public class ParticleFileWriter implements Observer {
         }
     }
 
+    public void finish(){
+        try {
+            energiesWriter.close();
+            positionsWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static String formatParticle(final FabricParticle p) {
 
         Vector3D pos = p.getPosition();
