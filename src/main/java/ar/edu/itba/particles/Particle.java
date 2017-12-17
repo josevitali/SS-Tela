@@ -3,6 +3,9 @@ package ar.edu.itba.particles;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Particle{
     private String id;
     protected double mass;
@@ -11,6 +14,7 @@ public class Particle{
     protected Vector3D previousPosition;
     protected Vector3D velocity;
     protected Vector3D force;
+    private List<Vector3D> forces;
 
     public Particle(String id, double mass, Vector3D position, double radius) {
         this.id = id;
@@ -20,6 +24,7 @@ public class Particle{
         this.previousPosition = this.position;
         this.velocity = Vector3D.ZERO;
         this.force = Vector3D.ZERO;
+        this.forces = new LinkedList<>();
     }
 
     public Particle(String id, double mass, Vector3D position, Vector3D velocity) {
@@ -54,20 +59,34 @@ public class Particle{
         return velocity;
     }
 
-    public Vector3D getForce() {
-        return force;
-    }
-
     public Vector3D getPreviousPosition() {
         return previousPosition;
     }
 
-    public Vector3D getAcceleration() {
-        return force.scalarMultiply(1.0/mass);
+    public Vector3D getForce() {
+        double ansX = 0.0;
+        double ansY = 0.0;
+        double ansZ = 0.0;
+
+        for (Vector3D force : forces) {
+            ansX += force.getX();
+            ansY += force.getY();
+            ansZ += force.getZ();
+        }
+
+        forces.clear();
+        Vector3D forcesSum = new Vector3D(ansX, ansY, ansZ);
+
+        return forcesSum;
     }
 
     public String getId() {
         return id;
+    }
+
+    public void addForce(Vector3D newForce) {
+        //this.force = this.force.add(newForce);
+        this.forces.add(newForce);
     }
 
     @Override

@@ -3,6 +3,7 @@ package ar.edu.itba;
 
 import ar.edu.itba.integrators.VerletIntegrator;
 import ar.edu.itba.observers.ParticleFileWriter;
+import ar.edu.itba.particles.HangingInitialState;
 import ar.edu.itba.particles.RegularInitialState;
 import ar.edu.itba.simulation.FabricSimulation;
 import ar.edu.itba.simulation.Parameters;
@@ -26,6 +27,8 @@ public class App  {
     public static final double REST_DISTANCE = 3;
     public static final double TORSION_NATURAL_ANGLE = 0;
     public static final double DT = 0.00001;
+    public static final double TIME = 2;
+    public static final int STEPS = (int)(TIME / DT);
 
 
 
@@ -45,15 +48,21 @@ public class App  {
         parameters.setDt(DT);
         parameters.setHeight(HEIGHT);
         parameters.setWidth(WIDTH);
-        parameters.setInitialState(new RegularInitialState(PARTICLE_DISTANCE, MASS, RADIUS));
+        //parameters.setInitialState(new RegularInitialState(PARTICLE_DISTANCE, MASS, RADIUS));
+        parameters.setInitialState(new HangingInitialState(PARTICLE_DISTANCE, MASS, RADIUS));
         parameters.setInitialT(0);
         parameters.setIntegrator(new VerletIntegrator());
-        parameters.setLinearSpring(new LinearSpring(K, REST_DISTANCE));
-        parameters.setTorsionSpring(new TorsionSpring(TORSION_K, TORSION_NATURAL_ANGLE));
+        /*parameters.setLinearSpring(new LinearSpring(K, REST_DISTANCE));
+        parameters.setTorsionSpring(new TorsionSpring(TORSION_K, TORSION_NATURAL_ANGLE));*/
+        parameters.setLinearK(K);
+        parameters.setTorsionK(TORSION_K);
+        parameters.setRestDistance(REST_DISTANCE);
+        parameters.setTorsionNaturalAngle(TORSION_NATURAL_ANGLE);
+        parameters.setMass(MASS);
 
         FabricSimulation fabricSimulation = new FabricSimulation(parameters, observers);
 
-        fabricSimulation.simulate(100000);
+        fabricSimulation.simulate(STEPS);
 
 
     }

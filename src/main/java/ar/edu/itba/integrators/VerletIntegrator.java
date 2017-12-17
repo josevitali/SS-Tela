@@ -4,13 +4,13 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 public class VerletIntegrator implements Integrator{
 
-    public Vector3D[] integrate(Vector3D position, Vector3D velocity, Vector3D acceleration, Vector3D previousPosition, double dt) {
+    public Vector3D[] integrate(Vector3D position, Vector3D velocity, Vector3D force, Vector3D previousPosition, double dt, double mass) {
 
         Vector3D[] newVals = new Vector3D[2];
 
-        final double posX = 2 * position.getX() - previousPosition.getX() + acceleration.getX() * dt*dt;
-        final double posY = 2 * position.getY() - previousPosition.getY() + acceleration.getY() * dt*dt;
-        final double posZ = 2 * position.getZ() - previousPosition.getZ() + acceleration.getZ() * dt*dt;
+        final double posX = 2 * position.getX() - previousPosition.getX() + force.getX() * dt*dt / mass;
+        final double posY = 2 * position.getY() - previousPosition.getY() + force.getY() * dt*dt / mass;
+        final double posZ = 2 * position.getZ() - previousPosition.getZ() + force.getZ() * dt*dt / mass;
         final Vector3D pos = new Vector3D(posX, posY, posZ);
 
         final double velX = (posX - previousPosition.getX()) / (2.0 * dt);

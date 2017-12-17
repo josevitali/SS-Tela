@@ -15,6 +15,11 @@ public class Parameters {
     private double initialT, dt;
     private BiFunction<Integer, Integer, FabricParticle> initialState;
     private Integrator integrator;
+    private double linearK;
+    private double torsionK;
+    private double restDistance;
+    private double torsionNaturalAngle;
+    private double mass;
 
     public int getWidth() {
         return width;
@@ -78,5 +83,45 @@ public class Parameters {
 
     public void setIntegrator(Integrator integrator) {
         this.integrator = integrator;
+    }
+
+    public double getLinearK() {
+        return linearK;
+    }
+
+    public void setLinearK(double linearK) {
+        this.linearK = linearK;
+    }
+
+    public double getTorsionK() {
+        return torsionK;
+    }
+
+    public void setTorsionK(double torsionK) {
+        this.torsionK = torsionK;
+    }
+
+    public double getRestDistance() {
+        return restDistance;
+    }
+
+    public void setRestDistance(double restDistance) {
+        this.restDistance = restDistance;
+    }
+
+    public double getTorsionNaturalAngle() {
+        return torsionNaturalAngle;
+    }
+
+    public void setTorsionNaturalAngle(double torsionNaturalAngle) {
+        this.torsionNaturalAngle = torsionNaturalAngle;
+    }
+
+    public double getMass() {
+        return mass;
+    }
+
+    public void setMass(double mass) {
+        this.mass = mass;
     }
 }
